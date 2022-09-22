@@ -1,0 +1,43 @@
+version: 0.2
+
+# env:
+#   variables:
+#     NODE_ENV: "${env}"
+
+phases:
+  install:
+    commands:
+      - echo Installing Node 14...
+      - curl -fsSL https://deb.nodesource.com/setup_14.x | bash -
+      - apt-get install -y nodejs
+      - echo Installing NPM version 8.14.0...
+      - npm install npm@8.14.0 -g
+      - echo Installing Yarn...
+      - curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add -
+      - echo "deb https://dl.yarnpkg.com/debian/ stable main" | tee /etc/apt/sources.list.d/yarn.list
+      - apt install --no-install-recommends yarn
+      - echo Setting Yar version 1.22.19...
+      - yarn set version 1.22.19
+
+  pre_build:
+    commands:
+      - echo Installing dependencies on `date`
+      - yarn
+
+  build:
+    commands:
+      - echo Testing...
+      - CI=true yarn test
+      - echo Building...
+      - yarn build
+      
+artifacts:
+  files:
+    - "**/*"
+  name: "{app_service}-{app_name}-build-${env}"
+  discard-paths: no
+  base-directory: build
+
+cache:
+  paths:
+    - /root/.npm/**/*
