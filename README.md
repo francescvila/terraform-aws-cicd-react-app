@@ -54,24 +54,23 @@ In order to check AWS configurations and the creation of resources and services 
 
 ### Installation
 
-For this project, we'll create a new AWS profile an then we'll reference it in our Terraform project.
-I've named mine "sandbox".
+In order to check AWS configurations and the creation of resources and services we'll need to install the AWS client application (See the links section).
+
+We can create a new AWS profile. If we name it "default", we won't need to referent it in all AWS CLI commands.
 If you already have an AWS profile created for other purposes, backup your ~/.aws/config and ~/.aws/credentials files.
 
 ```sh
 mkdir ~/.aws
-echo -e "[profile sandbox]\nregion = us-east-1\noutput = json" > ~/.aws/config
-echo -e "[sandbox]\naws_access_key_id = AWS_ACCESS_KEY  >\naws_secret_access_key = AWS_SECRET_KEY" > ~/.aws/credentials
+echo -e "[profile default]\nregion = us-east-1\noutput = json" > ~/.aws/config
+echo -e "[default]\naws_access_key_id = AWS_ACCESS_KEY >\naws_secret_access_key = AWS_SECRET_KEY" > ~/.aws/credentials
 ```
 
 If you prefer to create your infrastructure in a different region than "us-east-1", feel free to change it in the config file.
 Replace "AWS_ACCESS_KEY" and AWS_SECRET_KEY with yours.
-If you prefer another profile name you can it in the config file.
-
 
 To check the profile is correctly configured execute the command:
 ```sh
-aws configure --profile sandbox
+aws configure
 ```
 
 Generate a unique name for the S3 backend bucket used to store the Terraform state.
@@ -82,17 +81,17 @@ echo $TFSTATE_BUCKET
 
 You can create the S3 bucket using de AWS interactive dashboard or directly with an aws cli command:
 ```sh
-aws s3api create-bucket --bucket $TFSTATE_BUCKET --region us-east-1 --profile sandbox
+aws s3api create-bucket --bucket $TFSTATE_BUCKET --region us-east-1
 ```
 
 If we want to enable server-side encryption then execute:
 ```sh
-aws s3api put-bucket-encryption --bucket $TFSTATE_BUCKET  --profile sandbox --server-side-encryption-configuration '{"Rules": [{"ApplyServerSideEncryptionByDefault": {"SSEAlgorithm": "AES256"}}]}'
+aws s3api put-bucket-encryption --bucket $TFSTATE_BUCKET --server-side-encryption-configuration '{"Rules": [{"ApplyServerSideEncryptionByDefault": {"SSEAlgorithm": "AES256"}}]}'
 ```
 
 To check if the bucket is created execute the command:
 ```sh
-aws s3api list-buckets --profile sandbox
+aws s3api list-buckets
 ```
 
 Update the backend section in file ./envs/dev/provider.tf with the new bucket name.
@@ -179,22 +178,22 @@ We can also check what we provisioned using de AWS CLI commands:
 
 S3
 ```sh
-aws s3api list-buckets --profile sandbox
+aws s3api list-buckets
 ```
 
 CloudFront
 ```sh
-aws cloudfront list-distributions --profile sandbox
+aws cloudfront list-distributions
 ```
 
 CodeCommit
 ```sh
-aws codecommit list-repositories --profile sandbox
+aws codecommit list-repositories
 ```
 
 CodePipeline
 ```sh
-aws codepipeline list-pipelines --profile sandbox
+aws codepipeline list-pipelines
 ```
 
 ## Changelog
